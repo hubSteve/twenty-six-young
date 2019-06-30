@@ -1,0 +1,60 @@
+package ${bussiPackage}.${entityPackage}.service.impl;
+
+import org.jeecg.common.util.oConvertUtils;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.mapper.${entityName}Mapper;
+import ${bussiPackage}.${entityPackage}.service.I${entityName}Service;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+<#assign pidFieldName = "">
+<#assign hasChildrenField = "">
+<#list originalColumns as po>
+<#if po.fieldDbName == tableVo.extendParams.pidField>
+<#assign pidFieldName = po.fieldName>
+</#if>
+<#if po.fieldDbName == tableVo.extendParams.hasChildren>
+<#assign hasChildrenField = po.fieldName>
+</#if>
+</#list>
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: jeecg-boot
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Service
+public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, ${entityName}> implements I${entityName}Service {
+
+	@Override
+	public void add${entityName}(${entityName} ${entityName?uncap_first}) {
+		if(oConvertUtils.isEmpty(${entityName?uncap_first}.get${pidFieldName?cap_first}())){
+			${entityName?uncap_first}.set${pidFieldName?cap_first}(I${entityName}Service.ROOT_PID_VALUE);
+		}else{
+			//如果当前节点父ID不为空 则设置父节点的hasChildren 为1
+			${entityName} parent = baseMapper.selectById(${entityName?uncap_first}.get${pidFieldName?cap_first}());
+			if(parent!=null && !"1".equals(parent.get${hasChildrenField?cap_first}())){
+				parent.set${hasChildrenField?cap_first}("1");
+				baseMapper.updateById(parent);
+			}
+		}
+		baseMapper.insert(${entityName?uncap_first});
+	}
+	
+	@Override
+	public void update${entityName}(${entityName} ${entityName?uncap_first}) {
+		if(oConvertUtils.isEmpty(${entityName?uncap_first}.get${pidFieldName?cap_first}())){
+			${entityName?uncap_first}.set${pidFieldName?cap_first}(I${entityName}Service.ROOT_PID_VALUE);
+		}else{
+			//如果当前节点父ID不为空 则设置父节点的hasChildren 为1
+			${entityName} parent = baseMapper.selectById(${entityName?uncap_first}.get${pidFieldName?cap_first}());
+			if(parent!=null && !"1".equals(parent.get${hasChildrenField?cap_first}())){
+				parent.set${hasChildrenField?cap_first}("1");
+				baseMapper.updateById(parent);
+			}
+		}
+		baseMapper.updateById(${entityName?uncap_first});
+	}
+
+}
